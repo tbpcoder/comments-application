@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Comments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='commentsstyle.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+    <script>
+        // JavaScript to prevent textarea resize and submit on Enter key press
+        document.addEventListener('DOMContentLoaded', function() {
+            var textarea = document.querySelector('textarea');
+            textarea.addEventListener('keydown', function(event) {
+                if (event.keyCode === 13 && !event.shiftKey) {
+                    event.preventDefault();
+                    this.form.submit();
+                }
+            });
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="comments-container">
+        <h1>Comments</h1>
+        <form action="{{ url_for('comments') }}" method="post">
+            <textarea name="content" rows="4" cols="50" placeholder="Write your comment here..." style="resize: none;"></textarea><br>
+            <button type="submit">Add Comment</button>
+        </form>
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+        <ul class="comments-list">
+        {% for comment in comments %}
+            <li{% if comment.username == session.username %} class="highlight"{% endif %}>
+                <strong>{{ comment.username }}:</strong> {{ comment.text }}
+                {% if session.username == 'admin' %}
+                    <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="post" style="display: inline;">
+                        <button type="submit" class="delete-button">
+                            🗑
+                        </button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
